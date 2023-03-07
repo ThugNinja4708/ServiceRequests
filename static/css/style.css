@@ -1,0 +1,79 @@
+body {
+    font-family: Helvetica;
+    margin: 5px;
+
+  }
+  a {
+    text-decoration: none;
+    color: #ffffff;
+  }
+  .site-header { 
+    border-bottom: 1px solid #030303;
+    padding: .5em 1em;
+    display: flex;
+    justify-content: space-between;
+    background-color: #000;
+  }
+  
+  .site-identity h1 {
+    font-size: 1.5em;
+    margin: .6em 0;
+    display: inline-block;
+  }
+  
+  
+  .site-navigation ul, 
+  .site-navigation li {
+    margin: 0; 
+    padding: 0;
+  }
+  
+  .site-navigation li {
+    display: inline-block;
+    margin: 1.4em 1em 1em 1em;
+
+  }
+  .site-navigation li :hover{
+    background-color: #323232;
+    transition: 0.2s linear;
+  }
+  input[type=text] {
+    width: 300px;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 1px solid rgb(0, 0, 0);
+    /* border-bottom: 2px solid red; */
+  }
+  input[type=text]:focus{
+    border-bottom: 3px solid rgb(0, 0, 0);
+    transition: 0.2s;
+    outline: none;
+  }
+  textarea{
+    resize: none;
+
+    outline: none;
+  }
+  textarea:focus{
+    transition: 0.2s;
+    border: 2px black solid;
+  }
+  label{
+    font-size: large;
+
+  }
+  .button {
+    background-color: #000000; /* Green */
+    border: none;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 10px;
+  }

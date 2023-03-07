@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home</title>
+  <script src="{{url_for('static', filename='index.js')}}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='icon.png') }}">
+
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="site-identity">
+      <h1><a href="#">PCloud</a></h1>
+    </div>  
+    <nav class="site-navigation">
+      <ul class="nav">
+        <li><a href="#" onclick="display(1)">IP WhiteList</a></li> 
+        <li><a href="#" onclick="display(2)">PSM Certificates</a></li> 
+        <li><a href="#" onclick="display(3)">LDAP Certificates</a></li> 
+      </ul>
+    </nav>
+  </header>
+
+  <form action="" id="Form">
+
+    <label for="CustomerId"> Customer Id: </label>
+    <input type="text" name="CustomerId" id="customerId" placeholder="CustomerId" class="input-text" />
+    <br /><br />
+
+    <!-- <label for="ListOfServices"> Service Request: </label>
+    <select id="ListOfServices" onchange="display()">
+      <option value="" selected disabled hidden>Choose here</option>
+      <option value="1">IP White List</option>
+      <option value="2">PSM Certificate</option>
+      <option value="3">LDAP Certificates</option>
+      <option value="4">get all tenants</option>
+    </select> -->
+
+    <br /><br />
+    <div id="block1" style="display: none;">
+      <label for="ListOfIPs">List of IPs: </label>
+      <textarea id="ListOfExisstingIPs" rows="4" cols="50" placeholder="0.0.0.0/24, 0.0.0.1/32 " readonly></textarea><br><br/>
+      <label for="ListOfUpdatedIPs">List Of UpdatedIPs: </label>
+      <textarea id="ListOfUpdatedIPs" rows="4" cols="50" placeholder="0.0.0.0/24, 0.0.0.1/32 " ></textarea>
+      <br /><br />
+    </div>
+
+    <div id="block2" style="display: none;">
+      <label for="files">List of PSM Certificates: </label>
+      <input type="file" id="psm-certificates" multiple accept=".der,.crt,.cer, .pem" name="psmFiles" /><br /><br />
+    </div>
+
+    <div id="block3" style="display: none;">
+      <label for="files">List of LDAP Certificates: </label>
+      <input type="file" id="ldap-certificates" multiple accept=".der,.crt,.cer, .pem" name="ldapFiles" /><br /><br />
+    </div>
+
+
+    <input type = "button" value="Submit" class="button" onclick="controller()">
+
+  </form>
+
+  <button onclick="getTaskStatus()"> Get Status </button>
+
+  <h4>
+    Status:
+    <p id="status"></p>
+  </h4>
+  <h4>
+    Message:
+    <p id="message"></p>
+  </h4>
+  <h4>
+    result:
+    <p id="result"></p>
+  </h4>
+</body>
+
+</html>

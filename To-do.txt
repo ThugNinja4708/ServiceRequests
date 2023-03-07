@@ -1,0 +1,6 @@
+1. Exception Handling.
+2. print all the json response to the user. //secondary 
+3. status should be displayed continously.
+4. queue should be implemented
+5. get status button. -> done 
+6. call this function (getTaskstatus) every 5 seconds untill successful
