@@ -2,7 +2,6 @@ const myHeaders = new Headers();
 myHeaders.append("Content-Type", "application/json");
 service_global = null;
 function display(service){
-
   // const service = document.getElementById("ListOfServices").value;
   // document.getElementById("customerId-block" ).style.display = "block";
   service_global = service;
@@ -169,4 +168,31 @@ async function getTaskStatus(){
   console.info( res ) // {flowProgress: Array(10), status: 'SUCCESS'} call this function every 5 seconds untill successful
   document.getElementById("status").innerHTML = res.status;
 
+}
+               
+async function sendData(){
+  const task_id = 2;
+  const customer_id = document.getElementById("customerId").value;
+  const support_id = 1; // should come from session storage
+
+  const task = "1" // ip_white_list
+  const body = "path to the file to send" || "list of IP's to send"
+  const description = "temp descriptions";
+  const status = "SUCCESS";
+
+  var data = {
+    customer_id: customer_id,
+    support_id: support_id,
+    description: description,
+    body: body,
+    task: task,
+    status: status,
+    task_id: task_id,
+  };
+  const response = await fetch("/inserIntoDatabase", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: myHeaders,
+  });
+  console.info(response);
 }
