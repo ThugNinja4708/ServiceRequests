@@ -70,6 +70,7 @@ async function updateIPs(data) {
   });;
 
   Object.assign(data, { IPs: IPs });
+  
   const response = await fetch("/updatePublicIPs", {
     method: "POST",
     body: JSON.stringify(data),
@@ -189,10 +190,32 @@ async function sendData(){
     status: status,
     task_id: task_id,
   };
+
   const response = await fetch("/inserIntoDatabase", {
     method: "POST",
     body: JSON.stringify(data),
     headers: myHeaders,
   });
-  console.info(response);
+
+}
+async function getData() {
+  data = {};
+  const response = await fetch("/getDataFromDatabase", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: myHeaders,
+  });
+
+}
+async function getCustomerName(){
+  const customer_id = document.getElementById("customerId").value;
+  data = {
+    customer_id: customer_id,
+  };
+  const response = await fetch("/getCustomerName", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: myHeaders,
+  });
+  console.log(await response.text());
 }

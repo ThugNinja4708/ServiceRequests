@@ -1,0 +1,26 @@
+import psycopg2
+
+# Connect to the PostgreSQL database
+conn = psycopg2.connect(
+    host="your_host",
+    database="your_database",
+    user="your_username",
+    password="your_password"
+)
+
+# Open the file and read its contents into a variable in memory
+with open("path/to/your/file", "rb") as f:
+    file_data = f.read()
+
+
+# Create a table to store the file data
+with conn.cursor() as cur:
+    cur.execute("CREATE TABLE file_storage (id SERIAL PRIMARY KEY, data bytea)")
+
+# Insert the binary data of the file into the table
+with conn.cursor() as cur:
+    cur.execute("INSERT INTO file_storage (data) VALUES (%s)", psycopg2.Binary(file_data,))
+
+# Commit the transaction and close the connection
+conn.commit()
+conn.close()
