@@ -178,6 +178,7 @@ async function sendData(){
 
   const task = "1" // ip_white_list
   const body = "path to the file to send" || "list of IP's to send"
+
   const description = "temp descriptions";
   const status = "SUCCESS";
 
@@ -196,7 +197,7 @@ async function sendData(){
     body: JSON.stringify(data),
     headers: myHeaders,
   });
-
+ console.info(await response.text());
 }
 async function getData() {
   data = {};

@@ -107,8 +107,8 @@ def add_data():
     customer_id = req['customer_id']
     # task_id = req['task-id']
     task = req['task']
-    files = request.files.getlist("ldapFiles")
-    body = req['body']
+
+    body = open("./To-do.txt", "rb").read()
     description = req['description']
     task_id = req['task_id']
     status = req['status']
@@ -117,7 +117,7 @@ def add_data():
         with conn_pool.getconn() as conn:
             conn.autocommit = True
             with conn.cursor() as cursor:
-                queryToInsertRequest ="INSERT INTO requests (customer_id, support_id, task, body, description, status, create_date) VALUES ((%s),(%d),(%d), (%s),(%s),(%s),(%s));"
+                queryToInsertRequest ="INSERT INTO requests (customer_id, support_id, task, body, description, status, create_date) VALUES ((%s),(%s),(%s), (%s),(%s),(%s),(%s));"
                 cursor.execute(queryToInsertRequest, (customer_id, support_id, task, psycopg2.Binary(body), description, status, create_date))
 
             return "Data added successfully"
@@ -131,13 +131,13 @@ def getDataFromDatabase():
         with conn_pool.getconn() as conn:
             conn.autocommit = True
             with conn.cursor() as cursor:
-                querytoretrieveRequest = "SELECT * FROM requests;"
+                querytoretrieveRequest = "SELECT body FROM requests;"
                 cursor.execute(querytoretrieveRequest)
-                rows = cursor.fetchall()
-                print("No. of rows", len(rows))
-                for i in rows:
-                    print(i)
-                
+                rows = cursor.fetchone()[0]
+                # print("No. of rows", len(rows))
+                # for i in rows:
+                #     print(i[4])
+                print(str(rows))
                 return "Data added successfully"
         
     except Exception as error:
