@@ -4,3 +4,12 @@
 4. queue should be implemented
 5. get status button. -> done 
 6. call this function (getTaskstatus) every 5 seconds untill successful
+
+
+
+cust_id
+task
+status
+
+created 
+completed date

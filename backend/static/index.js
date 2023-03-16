@@ -190,6 +190,7 @@ async function sendData(){
     task: task,
     status: status,
     task_id: task_id,
+    typeOfBody: "files",
   };
 
   const response = await fetch("/inserIntoDatabase", {
@@ -198,6 +199,7 @@ async function sendData(){
     headers: myHeaders,
   });
  console.info(await response.text());
+ 
 }
 async function getData() {
   data = {};
@@ -219,4 +221,10 @@ async function getCustomerName(){
     headers: myHeaders,
   });
   console.log(await response.text());
+}
+
+function test(){
+  const arry = ["fsf","fsfs","fsfsfs"]
+  const srr = ["dada","dadad"]
+  console.log(arry.concat(srr));
 }
