@@ -13,3 +13,11 @@ status
 
 created 
 completed date
+
+
+-------- status ------------
+WAITING_FOR_APPROVAL
+DENIED
+IN_PROGRESS
+FAILED
+SUCCESS

@@ -223,8 +223,16 @@ async function getCustomerName(){
   console.log(await response.text());
 }
 
-function test(){
-  const arry = ["fsf","fsfs","fsfsfs"]
-  const srr = ["dada","dadad"]
-  console.log(arry.concat(srr));
+async function updateTheStatusOfTasks(){
+  const customer_id = document.getElementById("customerId").value;
+  support_id = 1
+  data = {
+    support_id: support_id,
+  };
+  const response = await fetch("/updateTheStatusOfTasks", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: myHeaders,
+  });
+  console.log(await response.text());
 }

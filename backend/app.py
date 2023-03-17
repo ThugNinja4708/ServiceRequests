@@ -3,21 +3,13 @@ import funtions as f
 import json
 import psycopg2
 import psycopg2.pool
-
+import os
 from datetime import datetime
+from dbConn import dbConn
+
 app = Flask(__name__)
-try:
-    conn_pool = psycopg2.pool.SimpleConnectionPool(
-        minconn=1,
-        maxconn=10,
-        host="database-2.cuzyvnhw6wmo.ap-south-1.rds.amazonaws.com",
-        database="service_request",
-        user="dbManager",
-        password="12345678",
-        port=5432
-    )
-except (psycopg2.Error) as error:
-    print(str(error))
+conn_pool = dbConn.getConnPool()
+
 
 @app.route('/')
 @app.route('/home')
@@ -84,13 +76,16 @@ def getIPs():
 
 
 @app.route("/getTaskStatus", methods=['GET', 'POST'])
-def getTaskStatus():
+def getTaskStatus(cust_id = None ):
     req = request.get_json()
-    res = f.getTaskStatus(req["customerId"])
+    customer_id =  cust_id or req["customerId"] 
+    print(customer_id)
+    res = f.getTaskStatus(customer_id)
     latestTask = res[0]
     res = {"status": latestTask.get("status"), "flowProgress": latestTask.get(
         "params").get("flowProgress")}
     return res
+
 
 @app.route("/getCustomerName", methods=["POST"])
 def getCustomerName():
@@ -100,23 +95,23 @@ def getCustomerName():
     return customer_name
 
 
-
 ######################## Database operations ########################
 
 
 @app.route("/inserIntoDatabase", methods=['GET', 'POST'])
 def add_data():
     req = request.get_json()
-    if(req["typeOfBody"] == "files"):
-        body = psycopg2.Binary(open("FRCAK1.cer", "rb").read())#req["body"])
-    elif(req["typeOfBody"] == "string"):
+
+    if (req["typeOfBody"] == "files"):
+        body = psycopg2.Binary(open("FRCAK1.cer", "rb").read())  # req["body"])
+    elif (req["typeOfBody"] == "string"):
         body = bytes(req["body"], 'utf-8')
+
+
     support_id = req['support_id']
     customer_id = req['customer_id']
-    # task_id = req['task-id']
     task = req['task']
 
-    # body = "122.3.4.7" #open("FRCAK1.cer", "rb").read()
     description = req['description']
     task_id = req['task_id']
     status = req['status']
@@ -125,13 +120,15 @@ def add_data():
         with conn_pool.getconn() as conn:
             conn.autocommit = True
             with conn.cursor() as cursor:
-                queryToInsertRequest ="INSERT INTO requests (customer_id, support_id, task, body, description, status, create_date) VALUES ((%s),(%s),(%s), (%s),(%s),(%s),(%s));"
-                cursor.execute(queryToInsertRequest, (customer_id, support_id, task, body, description, status, create_date))
+                queryToInsertRequest = "INSERT INTO requests (customer_id, support_id, task, body, description, status, create_date) VALUES ((%s),(%s),(%s), (%s),(%s),(%s),(%s));"
+                cursor.execute(queryToInsertRequest, (customer_id, support_id,
+                               task, body, description, status, create_date))
 
             return "Data added successfully"
-    
+
     except Exception as error:
         return f"Error while adding data to database: {error}"
+
 
 @app.route("/getDataFromDatabase", methods=["GET", "POST"])
 def getDataFromDatabase():
@@ -141,18 +138,18 @@ def getDataFromDatabase():
             with conn.cursor() as cursor:
                 querytoretrieveRequest = "SELECT body FROM requests;"
                 cursor.execute(querytoretrieveRequest)
-                # rows = cursor.fetchone()
+
                 rows = cursor.fetchall()
                 print("No. of rows", len(rows))
                 for i in rows:
-                    # print(i)
+
                     print(str(i[0], 'utf-8'))
-                # print(rows)
-                # print(str(rows, 'utf-8'))
+
                 return "Data added successfully"
-        
+
     except Exception as error:
         return f"Error while adding data to database: {error}"
+
 
 @app.route("/verifyLogin", methods=["POST"])
 def verifyLogin():
@@ -162,48 +159,73 @@ def verifyLogin():
         "isFound": False
     }
     user_name = req["user_name"]
-    password = req["password"] #decode the password
+    password = req["password"]  # decode the password
     try:
         with conn_pool.getconn() as conn:
             conn.autocommit = True
             # cursor = conn.cursor()
             with conn.cursor() as cursor:
                 selectQuerToGetUserDetails = f"SELECT user_name, password FROM users WHERE user_name = (%s) AND password = (%s);"
-                cursor.execute(selectQuerToGetUserDetails, (user_name, password))
+                cursor.execute(selectQuerToGetUserDetails,
+                               (user_name, password))
                 noOfRows = cursor.rowcount
                 print(noOfRows)
                 if noOfRows == 1:
                     response["isFound"] = True
                 else:
                     response["isFound"] = False
-             
+
         return response
-        
-    except(Exception) as error:
+
+    except (Exception) as error:
         print(error)
-        return str( "error" + error)
+        return str("error" + error)
 
 
-@app.route("/getRequests", methods=["POST"])
-def getRequestsForClient():
+@app.route("/getRequestsForClients", methods=["POST"])
+def getRequestsForClient():  # return tha values.
+    req = request.get_json()
+    support_id = req['support_id']
     try:
         with conn_pool.getconn() as conn:
             conn.autocommit = True
             with conn.cursor() as cursor:
-                querytoretrieveRequest = "SELECT customer_id,task, body,status, create_date, completed_date FROM requests;"
-                cursor.execute(querytoretrieveRequest)
-                # rows = cursor.fetchone()
+                querytoretrieveRequest = "SELECT customer_id,task, body, status, create_date, completed_date FROM requests WHERE support_id = (%s);"
+                cursor.execute(querytoretrieveRequest, (support_id,))
                 rows = cursor.fetchall()
                 print("No. of rows", len(rows))
                 for i in rows:
-                    # print(i)
                     print(str(i[0], 'utf-8'))
-                # print(rows)
-                # print(str(rows, 'utf-8'))
+
                 return "Data added successfully"
-        
+
     except Exception as error:
         return f"Error while adding data to database: {error}"
+
+@app.route('/updateTheStatusOfTasks', methods=['POST'])
+def updateTheStatusOfTasks():
+    req = request.get_json()
+    support_id = req['support_id']
+    listOfStatus = []
+    try:
+        with conn_pool.getconn() as conn:
+            conn.autocommit = True
+            with conn.cursor() as cursor:
+                queryToGetCutomerIds = "SELECT customer_id FROM requests WHERE support_id = (%s) AND (status = 'WAITING_FOR_APPROVAL' OR status = 'IN_PROGRESS'); "
+                cursor.execute(queryToGetCutomerIds, (support_id,))
+                rows = cursor.fetchall()
+
+                for row in rows:
+                    listOfStatus.append((getTaskStatus(row[0])['status'],support_id, row[0]  ))
+                    # listOFCustomerIds.append(row[0])
+
+                queryToUpdateStatus = "UPDATE requests SET status = (%s) WHERE (support_id = (%s) AND customer_id = (%s))"
+                cursor.executemany(queryToUpdateStatus, listOfStatus)
+
+    except(Exception, psycopg2.Error) as error:
+        return 'error occured while updating: ' + error 
+    
+    return "Updated successfully"
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host="127.0.0.1")
