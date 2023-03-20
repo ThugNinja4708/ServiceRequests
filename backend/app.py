@@ -6,7 +6,7 @@ import psycopg2.pool
 import os
 from datetime import datetime
 from dbConn import dbConn
-
+import time
 app = Flask(__name__)
 conn_pool = dbConn.getConnPool()
 
@@ -100,12 +100,21 @@ def getCustomerName():
 
 @app.route("/inserIntoDatabase", methods=['GET', 'POST'])
 def add_data():
-    req = request.get_json()
-
+    # req = request.get_json() # change this
+    req = json.loads(request.form["data"])
+    path = "database_files"
     if (req["typeOfBody"] == "files"):
-        body = psycopg2.Binary(open("FRCAK1.cer", "rb").read())  # req["body"])
+        list = []
+        files = request.files.getlist("files")
+        for file in files:
+            fileName =  str(time.time_ns()) +"_"+ file.filename
+            list.append(fileName)
+            file.save(path +  "\\" + fileName)
+        csv_of_files = ",".join(list)
+        body = csv_of_files
+        # body = psycopg2.Binary(open("FRCAK1.cer", "rb").read())   req["body"])
     elif (req["typeOfBody"] == "string"):
-        body = bytes(req["body"], 'utf-8')
+        body = req["body"]
 
 
     support_id = req['support_id']
@@ -115,7 +124,7 @@ def add_data():
     description = req['description']
     task_id = req['task_id']
     status = req['status']
-    create_date = str(datetime.now().date())
+    create_date = str(datetime.timestamp() .now().date())
     try:
         with conn_pool.getconn() as conn:
             conn.autocommit = True
@@ -226,6 +235,21 @@ def updateTheStatusOfTasks():
         return 'error occured while updating: ' + error 
     
     return "Updated successfully"
+
+
+
+@app.route('/testing', methods=['GET', 'POST'])
+def test():
+    files = request.files.getlist("files")
+    path = "database_files"
+    list = []
+    for file in files:
+        fileName =  str(time.time_ns()) +"_"+ file.filename
+        list.append(fileName)
+        file.save(path +  "\\" + fileName)
+    csv_of_files = ",".join(list)
+    print(csv_of_files)
+    return "0"
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host="127.0.0.1")

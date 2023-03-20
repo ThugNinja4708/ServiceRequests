@@ -193,10 +193,12 @@ async function sendData(){
     typeOfBody: "files",
   };
 
+  const formData = new FormData();
+  formData.append('data', JSON.stringify(data));
+
   const response = await fetch("/inserIntoDatabase", {
     method: "POST",
-    body: JSON.stringify(data),
-    headers: myHeaders,
+    body: formData,
   });
  console.info(await response.text());
  
@@ -235,4 +237,27 @@ async function updateTheStatusOfTasks(){
     headers: myHeaders,
   });
   console.log(await response.text());
+}
+
+async function test() {
+  const formData = new FormData();
+  const customerId = document.getElementById("customerId").value;
+  var data = {
+    customerId: customerId,
+  };
+  const input = document.getElementById("psm-certificates")
+  formData.append('data', JSON.stringify(data));
+
+  for (var i = 0; i < input.files.length; i++) {
+    if(isValidFileFormat(input.files[i].name)) {
+      formData.append('files', input.files[i]);
+    }else{
+      console.info("Invalid file type");
+      return false;
+    }
+  }
+  const response = await fetch("/testing", {
+    method: "POST",
+    body: formData,
+  });
 }
