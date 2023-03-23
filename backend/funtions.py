@@ -1,7 +1,7 @@
 import requests
 import json
 headers = {
-    'Authorization': 'eyJraWQiOiJSbENXRENCQ2NRbGdtTGVPcDlCcnMwV2VPQTluS1ZHZUNFTnJFQWJaeGlvPSIsImFsZyI6IlJTMjU2In0.eyJhdF9oYXNoIjoiSk5aZDdCaEhqbXRJal9kdHZLekNwZyIsInN1YiI6ImI3MjUwZWE0LTZmMzAtNDliOC1iZWRlLTYwYTQ0M2EzMDg2NyIsImNvZ25pdG86Z3JvdXBzIjpbInVzLWVhc3QtMV9kVkdSY2RLUTFfY3liZXJhcmstaWRlbnRpdHkiXSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tXC91cy1lYXN0LTFfZFZHUmNkS1ExIiwiY29nbml0bzp1c2VybmFtZSI6ImN5YmVyYXJrLWlkZW50aXR5X3JrYW50aGFAY3liZXJhcmsuY29tIiwibm9uY2UiOiJ4S0lzdjhSZVN2aFk0aWhxU1Fad09GV0lnbXRGSzZTZ0Y1bDlIRm9WVDd2c1dCNWpuY0FReDJiSEVzaFIyczl2d21lWHgzcTJuQ3UzbTJQMUlYMjh1aFZGWkxvcWxaN2JXZGlHTXNVcTZ4aW1nc2FQUHhlRzZKeU9xM3RBRXItaGdvWDJWVGVqUjA4eDlIOEMxLWlPMzhadUFGYXNQYlhBcS1GVnQzakdsRWsiLCJhdWQiOiI2cXFucGxvNWJjZmFraDRjamZwOGhtb3RucCIsImlkZW50aXRpZXMiOlt7InVzZXJJZCI6InJrYW50aGFAY3liZXJhcmsuY29tIiwicHJvdmlkZXJOYW1lIjoiY3liZXJhcmstaWRlbnRpdHkiLCJwcm92aWRlclR5cGUiOiJTQU1MIiwiaXNzdWVyIjoiaHR0cHM6XC9cL2FhZTQyMjIubXkuaWRhcHRpdmUuYXBwXC8xNzZjNDA5Yi0wNTRhLTQ4ZjQtOWRjMi1jOWU3MjM4ZDhkOWEiLCJwcmltYXJ5IjoidHJ1ZSIsImRhdGVDcmVhdGVkIjoiMTY3Mjg0MzMwMDQzNSJ9XSwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE2NzkwMzE0MzMsImN1c3RvbTpVU0VSX0dST1VQUyI6InBDbG91ZENvbnNvbGVPcHNQUkQiLCJleHAiOjE2NzkwNDU4MzMsImlhdCI6MTY3OTAzMTQzM30.QbBKnsRox0vKXmSqqiRgkGHWhjTNRKCOME2QabRp3e6ZKWGrvCcJkfMfLusd2T9n2iFg3DnKxfkGNSmGO6ACxEu6F1Y5NscBVKeKkJx8mQ2O7rOIsDmgwByKU4zmPrKxLRIfn8UVmoyw7vqlwcHNmQaP15Yybcy1g1CTsSfsTDNnxj7jR-BQPinLVIAly6uG47iL2yeZWFM-7JO4EiR7s7u5wjcEJgE5D_Aqqw-SbNk4W1vFYzy3oyo1Y-k0PDwI8b7MrSGTrvMu0u03kNDtMm6AE8ng9ZgTAv6BKuF6hguH7Qb1xpiJElteV4txUgvgy4T59fPQNadthVeuNMnqdg',
+    'Authorization': 'eyJraWQiOiJSbENXRENCQ2NRbGdtTGVPcDlCcnMwV2VPQTluS1ZHZUNFTnJFQWJaeGlvPSIsImFsZyI6IlJTMjU2In0.eyJhdF9oYXNoIjoiYzNLZVZqcjFNTXQ2UGVxQTcwbnhkdyIsInN1YiI6ImI3MjUwZWE0LTZmMzAtNDliOC1iZWRlLTYwYTQ0M2EzMDg2NyIsImNvZ25pdG86Z3JvdXBzIjpbInVzLWVhc3QtMV9kVkdSY2RLUTFfY3liZXJhcmstaWRlbnRpdHkiXSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tXC91cy1lYXN0LTFfZFZHUmNkS1ExIiwiY29nbml0bzp1c2VybmFtZSI6ImN5YmVyYXJrLWlkZW50aXR5X3JrYW50aGFAY3liZXJhcmsuY29tIiwibm9uY2UiOiJPZzJtXzdUaEtLUG1OWC1Ya3NpMVBnSkM2cmYxWXh3TVZ5dXRua3FTNHVuZU9paEFObTg0Zm9MZ2pMeFBaSk5IdHRDWWYzaUdtYnVnb2NhTmxmeXB6MVltMXdjZGR4Zm9UbFpGQkhWT2VmV0g2YnhUS1pjRDhHM2xzTjBUSnljZ0pMX2lrdU1hdm9FcHYxc1RDN3RVcFYtLVNsVTlqUHRsOXhIdnVVaktxMVEiLCJhdWQiOiI2cXFucGxvNWJjZmFraDRjamZwOGhtb3RucCIsImlkZW50aXRpZXMiOlt7InVzZXJJZCI6InJrYW50aGFAY3liZXJhcmsuY29tIiwicHJvdmlkZXJOYW1lIjoiY3liZXJhcmstaWRlbnRpdHkiLCJwcm92aWRlclR5cGUiOiJTQU1MIiwiaXNzdWVyIjoiaHR0cHM6XC9cL2FhZTQyMjIubXkuaWRhcHRpdmUuYXBwXC8xNzZjNDA5Yi0wNTRhLTQ4ZjQtOWRjMi1jOWU3MjM4ZDhkOWEiLCJwcmltYXJ5IjoidHJ1ZSIsImRhdGVDcmVhdGVkIjoiMTY3Mjg0MzMwMDQzNSJ9XSwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE2NzkzODgxODEsImN1c3RvbTpVU0VSX0dST1VQUyI6InBDbG91ZENvbnNvbGVPcHNQUkQiLCJleHAiOjE2Nzk0MDI1ODEsImlhdCI6MTY3OTM4ODE4MX0.KhkCu3i1Hp-OqJWrx0dzlvZkUZc9MpyFt4FJ5mZbeM4ccIeYe2DuoeRldL4DdxQOJhWOHNEDnZ9Yzz14ZdAZnHFbHf-oXVjkMFQGPGMYod1TNVpK65q4H4-PiKT6agh62aGrT_V4DqSCtH9TW8jH1Zso9Z1-3cd2bdhCNN5Cdf1dqYTYA0dRNO60ZzVUx_fTIVQ-toFlPdsFwoZyTNOwkrFNr_x75EVwMHFfloHZXJCPFcAJ9O5YInhMluc1GzM_EwelvgQkkwhYH3aQsYb4iiTw9VXmZAY1NKGCDIqoJu4vRE3ZXybsXn-NugqkpXWZEbrFIcT3XYUlQeBaofPs0g',
 }
 
 
@@ -28,20 +28,24 @@ def getTenantByCustomerId(customerId):
 
 def getPublicIPs(customerId):
     res = getTenantByCustomerId(customerId)
-    print(res['customerPublicIPs'])
-    return ",".join(res['customerPublicIPs']) if (res['customerPublicIPs'] != 'null') and res['customerPublicIPs'] != [] and res['customerPublicIPs'] != None else "No IPs"
+    # print(res['customerPublicIPs'])
+    return res['customerPublicIPs'] if (res['customerPublicIPs'] != 'null') and res['customerPublicIPs'] != [] and res['customerPublicIPs'] != None else []
 
 
 def updatePublicIPs(customerId, IPsToBeAdded):
-    # customerPublicIPs = getPublicIPs(customerId)
-    # for i in IPsToBeAdded:
-    #     customerPublicIPs.append(i)
+    customerPublicIPs = getPublicIPs(customerId)
+    # print("customerPublicIPs: ", customerPublicIPs)
+    # print("IP: ",IPsToBeAdded)
+    for i in IPsToBeAdded:
+        customerPublicIPs.append(i)
+    # print(customerPublicIPs)
     url = f"https://console.privilegecloud.cyberark.com/tenants/v1/{customerId}/config"
     headers['Content-Type'] = 'application/json'
-    payload = json.dumps({"customerPublicIPs": IPsToBeAdded, })
+    payload = json.dumps({"customerPublicIPs": customerPublicIPs, })
     # print(payload['public_ips'])
 
     response = requests.patch(url, headers=headers, data=payload)
+    
     return response.json()
 
 
@@ -57,8 +61,12 @@ def deployFeature_H5GW(customerId):
 def installPSMCertificate(customerId, psm_files):
     payload = {'description': 'this is file description'}
     files = []
-    for i in range(len(psm_files)):
-        files.append(('files', (psm_files[i].filename,psm_files[i], 'application/octet-stream')))
+    path = "database_files"
+    for file_name in psm_files:
+        fileName = file_name[file_name.index("_")+1:]
+        # print("fileName: " , fileName)
+        # print("path: " , path + "\\" + file_name)
+        files.append(('files', (fileName, open(path + "\\" + file_name, 'rb'), 'application/octet-stream')))
 
     url = f"https://console.privilegecloud.cyberark.com/files/v1/installPsmCertificate/{customerId}"
     
@@ -72,15 +80,19 @@ def installPSMCertificate(customerId, psm_files):
 def installLDAPCertificate(customerId, ldap_files):
     payload = {'description': 'this is file description'}
     files = []
-    for i in range(len(ldap_files)):
-        files.append(('files', (ldap_files[i].filename,ldap_files[i], 'application/octet-stream')))
+    path = "database_files"
+    for file_name in ldap_files:
+        fileName = file_name[file_name.index("_")+1:]
+        # print("fileName: " , fileName)
+        # print("path: " , path + "\\" + file_name)
+        files.append(('files', (fileName, open(path + "\\" + file_name, 'rb'), 'application/octet-stream')))
 
     url = f"https://console.privilegecloud.cyberark.com/files/v1/installCertificate/{customerId}"
     
     # headers.pop('Content-Type') # so that we can send multipart/form-data (files)
 
     response = requests.post(url, headers=headers, data=payload, files=files)
-
+    
     return response.json()
 
 def getTaskStatus(customerId):

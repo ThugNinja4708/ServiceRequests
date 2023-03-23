@@ -104,7 +104,7 @@ function isValidFileFormat(fileName) {
 async function updatePSMcertificates(data, input) {
   const formData = new FormData();
   formData.append('data', JSON.stringify(data));
-
+  
   for (var i = 0; i < input.files.length; i++) {
     if(isValidFileFormat(input.files[i].name)) {
       formData.append('psmFiles', input.files[i]);
@@ -113,6 +113,7 @@ async function updatePSMcertificates(data, input) {
       return false;
     }
   }
+
   const response = await fetch("/updatePSMcertificates", {
     method: "POST",
     body: formData,
@@ -172,37 +173,55 @@ async function getTaskStatus(){
 }
                
 async function sendData(){
-  const task_id = 2;
+  // const task_id = 2;
+  const formData = new FormData();
   const customer_id = document.getElementById("customerId").value;
+  const input = document.getElementById("ldap-certificates")
   const support_id = 1; // should come from session storage
 
-  const task = "1" // ip_white_list
-  const body = "path to the file to send" || "list of IP's to send"
-
+  const task = "4" // ip_white_list
+  // const body = 
+  for (var i = 0; i < input.files.length; i++) {
+    if(isValidFileFormat(input.files[i].name)) {
+      formData.append('body', input.files[i]);
+    }else{
+      console.info("Invalid file type");
+      return false;
+    }
+  }
   const description = "temp descriptions";
-  const status = "SUCCESS";
+  const status = "WAITING_FOR_APPROVAL";
+  // var data = {
+  //   customer_id: customer_id,
+  //   support_id: support_id,
+  //   description: description,
+  //   body: body,
+  //   task: task,
+  //   status: status,
+  //   task_id: task_id,
+  //   typeOfBody: "files",
+  // };
 
-  var data = {
-    customer_id: customer_id,
-    support_id: support_id,
-    description: description,
-    body: body,
-    task: task,
-    status: status,
-    task_id: task_id,
-    typeOfBody: "files",
-  };
 
-  const formData = new FormData();
-  formData.append('data', JSON.stringify(data));
+  formData.set('customer_id', customer_id);
+  formData.set('support_id', support_id);
+  formData.set('description', description);
+  // formData.set('body', body);
+  formData.set('task', task);
+  formData.set('status', status);
+  // formData.set('task_id', task_id);
+  // formData.set('type_of_Body', typeOfBody);
 
-  const response = await fetch("/inserIntoDatabase", {
+
+  const response = await fetch("/insertIntoDatabase", {
     method: "POST",
     body: formData,
   });
  console.info(await response.text());
  
 }
+
+
 async function getData() {
   data = {};
   const response = await fetch("/getDataFromDatabase", {
@@ -239,15 +258,22 @@ async function updateTheStatusOfTasks(){
   console.log(await response.text());
 }
 
+
+
 async function test() {
   const formData = new FormData();
   const customerId = document.getElementById("customerId").value;
+  const list_task_id = [8];
+  // const
   var data = {
     customerId: customerId,
   };
-  const input = document.getElementById("psm-certificates")
-  formData.append('data', JSON.stringify(data));
-
+  formData.set('list_task_id', list_task_id)
+  // formData.set('support_id', 1)
+  // // formData.set()
+  const input = document.getElementById("ldap-certificates")
+  // formData.append('data', JSON.stringify(data));
+  // console.log(input.files)                        
   for (var i = 0; i < input.files.length; i++) {
     if(isValidFileFormat(input.files[i].name)) {
       formData.append('files', input.files[i]);
@@ -256,8 +282,10 @@ async function test() {
       return false;
     }
   }
-  const response = await fetch("/testing", {
+
+  const response = await fetch("/approveRequest", {
     method: "POST",
     body: formData,
   });
+  console.info(await response.json())
 }

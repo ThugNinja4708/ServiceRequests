@@ -34,9 +34,6 @@ const LoginPage = () => {
       const response = await fetch("/verifyLogin", {
         method: "POST",
         body: JSON.stringify(data), // string or object
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
 
       const res = await response.json();

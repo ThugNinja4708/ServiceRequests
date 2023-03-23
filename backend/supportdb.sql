@@ -13,8 +13,7 @@ CREATE TABLE IF NOT EXISTS requests (
     support_id  INT REFERENCES users(support_id),
     task INT NOT NULL,
     body text , --varchar(200) NOT NULL,
-    description varchar(100) ,
-
+    -- description varchar(100) ,
     status VARCHAR(100) NOT NULL,
     error_message VARCHAR(100),
     create_date DATE NOT NULL,
