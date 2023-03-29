@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS requests (
     -- description varchar(100) ,
     status VARCHAR(100) NOT NULL,
     error_message VARCHAR(100),
-    create_date DATE NOT NULL,
+    created_date DATE NOT NULL,
     approval_date DATE,
-    complete_date DATE
+    completed_date DATE
 );
 

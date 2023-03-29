@@ -21,3 +21,9 @@ DENIED ->
 IN_PROGRESS -> ORANGE
 FAILED -> RED
 SUCCESS -> GREEN
+
+
+
+-------------------------------
+get status on approval and send to database
+validate cust_id

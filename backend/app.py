@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for,jsonify
-import funtions as f
+import pCloudConsoleAPIs as pCloud
 import json
 import psycopg2
 import psycopg2.pool
@@ -11,25 +11,27 @@ app = Flask(__name__)
 conn_pool = dbConn.getConnPool()
 
 
-@app.route('/')
-@app.route('/home')
-def home():
-    return render_template('index.html')
+# @app.route('/')
+# @app.route('/home')
+# def home():
+#     return render_template('index.html')
 
 
 @app.route('/getAllTenants', methods=['GET', 'POST'])
 def getAllTenants():
-    res = f.getALLTenants()
+    res = pCloud.getALLTenants()
     # print(res)
     return {"list of tenants": res}
 
 
 @app.route('/updatePublicIPs', methods=['GET', 'POST'])
 def updatePublicIPs(job = None):
-    req = job or request.get_json()
+    req = job or request.form
     # print(req['body'].split(","))
-    res = f.updatePublicIPs(req['customer_id'], req['body'].split(","))
+    res = pCloud.updatePublicIPs(req['customer_id'], req['body'].split(","))
     # print("result:", res)
+    # if("error_message" in res.keys()):
+    #     return res
     data = {"message": res.get('svcMessage'), "status": res.get('status')}
     return data
 
@@ -42,7 +44,7 @@ def updatePSMcertificates(job = None):
     # files = request.files.getlist("psmFiles")
     # data = json.loads(request.form["data"])
     print("files",files)
-    res = f.installPSMCertificate(customer_id, files)
+    res = pCloud.installPSMCertificate(customer_id, files)
     if type(res) == list:
         res = res[0]
         response["status"] = res["status"]
@@ -61,7 +63,7 @@ def updateLDAPcertificates(job = None):
     # data = json.loads(request.form["data"])
     customer_id = job["customer_id"]
     files = job["body"].split(",")
-    res = f.installLDAPCertificate(customer_id, files)
+    res = pCloud.installLDAPCertificate(customer_id, files)
     print(res)
     if type(res) == list:
         res = res[0]
@@ -76,20 +78,21 @@ def updateLDAPcertificates(job = None):
 def getIPs():
     req = request.get_json()
 
-    res = f.getPublicIPs(req["customerId"])
+    res = pCloud.getPublicIPs(req["customerId"])
     print(res)
     return {"list of public IPs": res}
 
 
 @app.route("/getTaskStatus", methods=['GET', 'POST'])
-def getTaskStatus(cust_id = None ):
-    req = request.get_json()
-    customer_id =  cust_id or req["customerId"] 
+def getTaskStatus(task_id ,cust_id = None ):
+    # req = request.get_json()
+    customer_id =  cust_id 
     print(customer_id)
-    res = f.getTaskStatus(customer_id)
+    res =pCloud.getTaskStatus(customer_id)
     latestTask = res[0]
-    res = {"status": latestTask.get("status"), "flowProgress": latestTask.get(
+    res = {"task_id":task_id,"status": latestTask.get("status"), "flowProgress": latestTask.get(
         "params").get("flowProgress")}
+    print(res)
     return res
 
 
@@ -97,7 +100,7 @@ def getTaskStatus(cust_id = None ):
 def getCustomerName():
     req = request.get_json()
     customer_id = req["customer_id"]
-    customer_name = f.getCustomerName(customer_id)
+    customer_name = pCloud.getCustomerName(customer_id)
     return customer_name
 
 
@@ -160,7 +163,7 @@ def getDataFromDatabase():
                 for i in rows:
                     print(str(i[0], 'utf-8'))
 
-                return "Data added successfully"
+        return "Data added successfully"
 
     except Exception as error:
         return f"Error while adding data to database: {error}"
@@ -204,21 +207,22 @@ def getRequestsForClient():  # return tha values.
         with conn_pool.getconn() as conn:
             conn.autocommit = True
             with conn.cursor() as cursor:
-                querytoretrieveRequest = "SELECT customer_id, task, body, status, create_date, complete_date FROM requests WHERE support_id = (%s); "
+                querytoretrieveRequest = "SELECT task_id, customer_id, task, body, status, create_date, complete_date FROM requests WHERE support_id = (%s); "
                 cursor.execute(querytoretrieveRequest, (support_id,))
                 rows = cursor.fetchall()
                 print("No. of rows", len(rows))
                 res = []
                 for row in rows:
                     l = {}
-                    l['customer_id'] = row[0]
-                    l['task'] = row[1]
-                    l['body'] = row[2]
-                    l['status'] = row[3]
-                    l['create_date'] = str(row[4])
-                    l['complete_date'] = row[5]
+                    l['task_id'] = row[0]
+                    l['customer_id'] = row[1]
+                    l['task'] = row[2]
+                    l['body'] = row[3]
+                    l['status'] = row[4]
+                    l['create_date'] = str(row[5])
+                    l['complete_date'] = row[6]
                     res.append(l)
-                print(res)        
+                # print(res)        
                 return jsonify(res)
 
     except Exception as error:
@@ -226,22 +230,22 @@ def getRequestsForClient():  # return tha values.
 
 @app.route('/updateTheStatusOfTasks', methods=['POST'])
 def updateTheStatusOfTasks():
-    req = request.get_json()
-    support_id = req['support_id']
+    # req = request.get_json()
+    support_id = request.form['support_id']
     listOfStatus = []
     try:
         with conn_pool.getconn() as conn:
             conn.autocommit = True
             with conn.cursor() as cursor:
-                queryToGetCutomerIds = "SELECT customer_id FROM requests WHERE support_id = (%s) AND (status = 'WAITING_FOR_APPROVAL' OR status = 'IN_PROGRESS'); "
+                queryToGetCutomerIds = "SELECT task_id, customer_id FROM requests WHERE support_id = (%s) AND (status = 'WAITING_FOR_APPROVAL' OR status = 'IN_PROGRESS'); "
                 cursor.execute(queryToGetCutomerIds, (support_id,))
                 rows = cursor.fetchall()
 
                 for row in rows:
-                    listOfStatus.append((getTaskStatus(row[0])['status'],support_id, row[0]))
+                    listOfStatus.append( (getTaskStatus(row[0],row[1])['status'],support_id, row[0]) )
                     # listOFCustomerIds.append(row[0])
-
-                queryToUpdateStatus = "UPDATE requests SET status = (%s) WHERE (support_id = (%s) AND customer_id = (%s))"
+                print(listOfStatus)
+                queryToUpdateStatus = "UPDATE requests SET status = (%s) WHERE (support_id = (%s) AND task_id = (%s))"
                 cursor.executemany(queryToUpdateStatus, listOfStatus)
 
 
@@ -258,6 +262,7 @@ def approveRequest():
         with conn_pool.getconn() as conn:
             conn.autocommit = True
             with conn.cursor() as cursor:
+                # queryToUpdateStatus = "UPDATE requests SET status = 'Approved' WHERE task_id "
                 queryToGetRequest = "SELECT customer_id, task, body FROM requests WHERE task_id IN ({0});".format(','.join(map(str, list_task_id)))
                 cursor.execute(queryToGetRequest)
                 rows = cursor.fetchall()
@@ -276,7 +281,6 @@ def approveRequest():
                 if(job['task'] == 2): 
                     #do it later 
                     #remove IP
-                    
                     pass
                 if(job['task'] == 3):
                     

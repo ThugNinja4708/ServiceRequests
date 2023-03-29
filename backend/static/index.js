@@ -263,7 +263,7 @@ async function updateTheStatusOfTasks(){
 async function test() {
   const formData = new FormData();
   const customerId = document.getElementById("customerId").value;
-  const list_task_id = [8];
+  const list_task_id = [2];
   // const
   var data = {
     customerId: customerId,

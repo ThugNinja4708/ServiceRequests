@@ -1,7 +1,8 @@
 import requests
 import json
+import http.client
 headers = {
-    'Authorization': 'eyJraWQiOiJSbENXRENCQ2NRbGdtTGVPcDlCcnMwV2VPQTluS1ZHZUNFTnJFQWJaeGlvPSIsImFsZyI6IlJTMjU2In0.eyJhdF9oYXNoIjoiYzNLZVZqcjFNTXQ2UGVxQTcwbnhkdyIsInN1YiI6ImI3MjUwZWE0LTZmMzAtNDliOC1iZWRlLTYwYTQ0M2EzMDg2NyIsImNvZ25pdG86Z3JvdXBzIjpbInVzLWVhc3QtMV9kVkdSY2RLUTFfY3liZXJhcmstaWRlbnRpdHkiXSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tXC91cy1lYXN0LTFfZFZHUmNkS1ExIiwiY29nbml0bzp1c2VybmFtZSI6ImN5YmVyYXJrLWlkZW50aXR5X3JrYW50aGFAY3liZXJhcmsuY29tIiwibm9uY2UiOiJPZzJtXzdUaEtLUG1OWC1Ya3NpMVBnSkM2cmYxWXh3TVZ5dXRua3FTNHVuZU9paEFObTg0Zm9MZ2pMeFBaSk5IdHRDWWYzaUdtYnVnb2NhTmxmeXB6MVltMXdjZGR4Zm9UbFpGQkhWT2VmV0g2YnhUS1pjRDhHM2xzTjBUSnljZ0pMX2lrdU1hdm9FcHYxc1RDN3RVcFYtLVNsVTlqUHRsOXhIdnVVaktxMVEiLCJhdWQiOiI2cXFucGxvNWJjZmFraDRjamZwOGhtb3RucCIsImlkZW50aXRpZXMiOlt7InVzZXJJZCI6InJrYW50aGFAY3liZXJhcmsuY29tIiwicHJvdmlkZXJOYW1lIjoiY3liZXJhcmstaWRlbnRpdHkiLCJwcm92aWRlclR5cGUiOiJTQU1MIiwiaXNzdWVyIjoiaHR0cHM6XC9cL2FhZTQyMjIubXkuaWRhcHRpdmUuYXBwXC8xNzZjNDA5Yi0wNTRhLTQ4ZjQtOWRjMi1jOWU3MjM4ZDhkOWEiLCJwcmltYXJ5IjoidHJ1ZSIsImRhdGVDcmVhdGVkIjoiMTY3Mjg0MzMwMDQzNSJ9XSwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE2NzkzODgxODEsImN1c3RvbTpVU0VSX0dST1VQUyI6InBDbG91ZENvbnNvbGVPcHNQUkQiLCJleHAiOjE2Nzk0MDI1ODEsImlhdCI6MTY3OTM4ODE4MX0.KhkCu3i1Hp-OqJWrx0dzlvZkUZc9MpyFt4FJ5mZbeM4ccIeYe2DuoeRldL4DdxQOJhWOHNEDnZ9Yzz14ZdAZnHFbHf-oXVjkMFQGPGMYod1TNVpK65q4H4-PiKT6agh62aGrT_V4DqSCtH9TW8jH1Zso9Z1-3cd2bdhCNN5Cdf1dqYTYA0dRNO60ZzVUx_fTIVQ-toFlPdsFwoZyTNOwkrFNr_x75EVwMHFfloHZXJCPFcAJ9O5YInhMluc1GzM_EwelvgQkkwhYH3aQsYb4iiTw9VXmZAY1NKGCDIqoJu4vRE3ZXybsXn-NugqkpXWZEbrFIcT3XYUlQeBaofPs0g',
+    'Authorization': 'eyJraWQiOiJSbENXRENCQ2NRbGdtTGVPcDlCcnMwV2VPQTluS1ZHZUNFTnJFQWJaeGlvPSIsImFsZyI6IlJTMjU2In0.eyJhdF9oYXNoIjoieVZMbUpiV0hWcVhPbUJ5dnlpaVlLZyIsInN1YiI6ImI3MjUwZWE0LTZmMzAtNDliOC1iZWRlLTYwYTQ0M2EzMDg2NyIsImNvZ25pdG86Z3JvdXBzIjpbInVzLWVhc3QtMV9kVkdSY2RLUTFfY3liZXJhcmstaWRlbnRpdHkiXSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tXC91cy1lYXN0LTFfZFZHUmNkS1ExIiwiY29nbml0bzp1c2VybmFtZSI6ImN5YmVyYXJrLWlkZW50aXR5X3JrYW50aGFAY3liZXJhcmsuY29tIiwiYXVkIjoiNnFxbnBsbzViY2Zha2g0Y2pmcDhobW90bnAiLCJpZGVudGl0aWVzIjpbeyJ1c2VySWQiOiJya2FudGhhQGN5YmVyYXJrLmNvbSIsInByb3ZpZGVyTmFtZSI6ImN5YmVyYXJrLWlkZW50aXR5IiwicHJvdmlkZXJUeXBlIjoiU0FNTCIsImlzc3VlciI6Imh0dHBzOlwvXC9hYWU0MjIyLm15LmlkYXB0aXZlLmFwcFwvMTc2YzQwOWItMDU0YS00OGY0LTlkYzItYzllNzIzOGQ4ZDlhIiwicHJpbWFyeSI6InRydWUiLCJkYXRlQ3JlYXRlZCI6IjE2NzI4NDMzMDA0MzUifV0sInRva2VuX3VzZSI6ImlkIiwiYXV0aF90aW1lIjoxNjc5NTU0NTY1LCJjdXN0b206VVNFUl9HUk9VUFMiOiJwQ2xvdWRDb25zb2xlT3BzUFJEIiwiZXhwIjoxNjc5NTY4OTY1LCJpYXQiOjE2Nzk1NTQ1NjV9.YffQnKEXi1en9L5p4zN7rmYRBhG8aBXczDqIvcruuiDXXcaXC4qYBr9aCfehKXSiI5Axq-RMS80C9GdYRXOo-aa_5-yRMEJMDe97C6ZZ28RzWIf2f3oyd-k5nkCnPbc9p9rH24K1IPXyYL3UeWBwcMKJYmw7ag32hijGhTu42mySmcdMsoDzsarWcdSlrFYD5W-9n830yDk1QaBwGHt8M6RW2D12JbCV5W6_TGE-cyJ2juA-Y1pC-cffo__djnmQ9hVN-LrxmPcKo-jROh9agKamnuocyURD4fun4RdM4LUZfTVZu7BMddcWdswVXrwX_yKS1OifrsIx_-x9kVY01w',
 }
 
 
@@ -23,13 +24,22 @@ def getTenantByCustomerId(customerId):
     headers['Content-Type'] = 'application/json'
     url = f"https://console.privilegecloud.cyberark.com/tenants/v1/{customerId}"
     response = requests.get(url, headers=headers)
-    return response.json()
+    if(response.status_code == 200 and response.status_code < 300):
+        return response.json()
+    else:
+        error_message = f"API call failed with status code {response.status_code} : {http.client.responses[response.status_code]}"
+        if response.content:
+            error_message += f" and response content: {response.content.decode()}"
+        raise Exception(error_message)
 
 
 def getPublicIPs(customerId):
     res = getTenantByCustomerId(customerId)
+    # if "error_message" in res.keys():
+    #     return res
+    isResposeValid = res['customerPublicIPs'] != 'null' and res['customerPublicIPs'] != [] and res['customerPublicIPs'] != None
     # print(res['customerPublicIPs'])
-    return res['customerPublicIPs'] if (res['customerPublicIPs'] != 'null') and res['customerPublicIPs'] != [] and res['customerPublicIPs'] != None else []
+    return res['customerPublicIPs'] if ( isResposeValid) else []
 
 
 def updatePublicIPs(customerId, IPsToBeAdded):
@@ -41,12 +51,16 @@ def updatePublicIPs(customerId, IPsToBeAdded):
     # print(customerPublicIPs)
     url = f"https://console.privilegecloud.cyberark.com/tenants/v1/{customerId}/config"
     headers['Content-Type'] = 'application/json'
-    payload = json.dumps({"customerPublicIPs": customerPublicIPs, })
+    payload = json.dumps({"customerPublicIPs": customerPublicIPs })
     # print(payload['public_ips'])
 
     response = requests.patch(url, headers=headers, data=payload)
+    if response.status_code >= 200 and response.status_code < 300:
+        return response.json()
+    else:
+        raise Exception(f"API call failed with status code {response.status_code}")
     
-    return response.json()
+    # return response.json()
 
 
 def deployFeature_H5GW(customerId):
